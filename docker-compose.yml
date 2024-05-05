@@ -1,0 +1,32 @@
+services:
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    container_name: mongo
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - api_network
+
+  api:
+    build: .
+    image: api:latest
+    ports:
+      - "3000:3000"
+    container_name: api
+    depends_on:
+      - mongo
+    networks:
+      - api_network
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/tarefas
+
+networks:
+  api_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
