@@ -1,12 +1,18 @@
 services:
-
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
     container_name: mongo
+    environment:
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+    command: mongod --auth
     volumes:
       - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
     networks:
       - api_network
 
@@ -21,7 +27,10 @@ services:
     networks:
       - api_network
     environment:
-      - MONGO_URL=mongodb://mongo:27017/tarefas
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_URL=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DATABASE}
 
 networks:
   api_network:
